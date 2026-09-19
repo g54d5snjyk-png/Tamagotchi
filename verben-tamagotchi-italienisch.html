@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verben-Tamagotchi · Italienisch</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #f2efe6; color: #2a2a2a; padding: 1.5rem 1rem; line-height: 1.6; margin: 0;">
+<div style="max-width: 560px; margin: 0 auto;">
+
+  <!-- Kopf -->
+  <div style="text-align:center; margin-bottom: 14px;">
+    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #b26a1a;">Verben-Tamagotchi</div>
+    <div style="font-size: 20px; font-weight: 700; color: #3a2c14;">Italienisch – verbi irregolari</div>
+    <div style="font-size: 13px; color: #8a7a5c;">Konjugiere unregelmäßige Verben im Presente und Passato Prossimo richtig – dein Wesen wächst und gedeiht davon!</div>
+  </div>
+
+  <!-- Tamagotchi-Gehäuse -->
+  <div style="background: #6ec6b8; border-radius: 42px; padding: 18px 18px 22px; box-shadow: inset 0 -6px 0 rgba(0,0,0,0.12), 0 6px 18px rgba(0,0,0,0.18); max-width: 380px; margin: 0 auto 18px;">
+    <div style="background: #dfeee0; border-radius: 26px; padding: 14px 14px 10px; border: 3px solid #3f6f66;">
+
+      <!-- Statusleisten -->
+      <div style="display:flex; gap:8px; margin-bottom: 8px; font-size: 11px; font-weight: 700; color:#3f6f66;">
+        <div style="flex:1;">
+          <div style="display:flex; justify-content:space-between;"><span>❤️ Gesundheit</span><span id="hpTxt">60</span></div>
+          <div style="background:#c7d9c8; border-radius:6px; height:9px; overflow:hidden; margin-top:2px;">
+            <div id="hpBar" style="background:#e0533f; height:100%; width:60%; border-radius:6px;"></div>
+          </div>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex; justify-content:space-between;"><span>⭐ Wachstum</span><span id="xpTxt">0/18</span></div>
+          <div style="background:#c7d9c8; border-radius:6px; height:9px; overflow:hidden; margin-top:2px;">
+            <div id="xpBar" style="background:#f0a92c; height:100%; width:0%; border-radius:6px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meisterschafts-Fortschritt (nur im gemischten Modus) -->
+      <div id="masteryRow" style="display:none; gap:8px; margin-bottom: 8px; font-size: 10px; font-weight: 700; color:#8a4b12;">
+        <div style="flex:1;">
+          <div style="display:flex; justify-content:space-between;"><span>☀️ Presente</span><span id="catPresTxt">0/12</span></div>
+          <div style="background:#c7d9c8; border-radius:6px; height:7px; overflow:hidden; margin-top:2px;">
+            <div id="catPresBar" style="background:#2f8a54; height:100%; width:0%; border-radius:6px;"></div>
+          </div>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex; justify-content:space-between;"><span>⌛ Passato</span><span id="catPassTxt">0/12</span></div>
+          <div style="background:#c7d9c8; border-radius:6px; height:7px; overflow:hidden; margin-top:2px;">
+            <div id="catPassBar" style="background:#b26a1a; height:100%; width:0%; border-radius:6px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sprite-Bühne -->
+      <div style="background:#eef7ee; border-radius:18px; padding:6px; text-align:center; position:relative;">
+        <div id="stageLabel" style="position:absolute; top:8px; left:12px; font-size:10px; font-weight:700; color:#7ba98f; text-transform:uppercase; letter-spacing:0.06em;">Baby</div>
+        <div id="reaction" style="position:absolute; top:6px; right:12px; font-size:20px; opacity:0; transition:opacity 0.3s;"></div>
+        <div id="sprite" style="min-height:170px; display:flex; align-items:flex-end; justify-content:center; transition:transform 0.18s ease;"></div>
+      </div>
+
+      <div id="mood" style="text-align:center; font-size:12px; color:#5c7e6f; margin-top:6px; min-height:16px;">Dein Wesen ist frisch geschlüpft und neugierig.</div>
+    </div>
+  </div>
+
+  <!-- Aufgaben-Panel -->
+  <div id="taskPanel" style="background:#ffffff; border-radius:16px; padding:18px 18px 20px; box-shadow:0 2px 10px rgba(0,0,0,0.06); border:1px solid #e8e2d4;">
+    <div id="scopeRow" style="display:none; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;">
+      <span id="scopeLabel" style="font-size:11px; font-weight:700; color:#3f6f66;"></span>
+      <button onclick="showSetup()" style="background:#eef4f2; border:1px solid #cfe0da; color:#3f6f66; font-size:11px; font-weight:600; padding:4px 10px; border-radius:7px; cursor:pointer; font-family:inherit; white-space:nowrap;">Auswahl ändern</button>
+    </div>
+    <div id="modeLabel" style="font-size:10px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:#b26a1a; margin-bottom:8px;">Aufgabe</div>
+    <div id="taskBody"></div>
+    <div id="feedback" style="margin-top:12px; font-size:13.5px; min-height:20px;"></div>
+  </div>
+
+  <div style="text-align:center; margin-top:12px;">
+    <span id="scoreLine" style="font-size:12px; color:#8a7a5c;"></span>
+  </div>
+
+  <div style="text-align:center; margin-top:8px;">
+    <button onclick="resetGame()" style="background:none; border:none; color:#b0a284; font-size:12px; cursor:pointer; text-decoration:underline; font-family:inherit;">Neu starten</button>
+  </div>
+
+</div>
+
+<script>
+/* ============ Verbdaten — unregelmäßige Verben, 1. Lernjahr Italienisch ============ */
+/* pres = Presente indicativo (io, tu, lui/lei, noi, voi, loro).
+   aux  = Hilfsverb im Passato Prossimo ("avere"/"essere").
+   pp   = Partizip Perfekt (Grundform, endet bei essere-Verben auf -o und wird
+          je nach Subjekt angeglichen: -o/-a/-i/-e). */
+var VERBS = [
+  {inf:"essere",   pres:{io:"sono",   tu:"sei",   lui:"è",     noi:"siamo",    voi:"siete",   loro:"sono"},    aux:"essere", pp:"stato"},
+  {inf:"avere",    pres:{io:"ho",     tu:"hai",   lui:"ha",    noi:"abbiamo",  voi:"avete",   loro:"hanno"},   aux:"avere",  pp:"avuto"},
+  {inf:"andare",   pres:{io:"vado",   tu:"vai",   lui:"va",    noi:"andiamo",  voi:"andate",  loro:"vanno"},   aux:"essere", pp:"andato"},
+  {inf:"venire",   pres:{io:"vengo",  tu:"vieni", lui:"viene", noi:"veniamo",  voi:"venite",  loro:"vengono"}, aux:"essere", pp:"venuto"},
+  {inf:"fare",     pres:{io:"faccio", tu:"fai",   lui:"fa",    noi:"facciamo", voi:"fate",    loro:"fanno"},   aux:"avere",  pp:"fatto"},
+  {inf:"dare",     pres:{io:"do",     tu:"dai",   lui:"dà",    noi:"diamo",    voi:"date",    loro:"danno"},   aux:"avere",  pp:"dato"},
+  {inf:"stare",    pres:{io:"sto",    tu:"stai",  lui:"sta",   noi:"stiamo",   voi:"state",   loro:"stanno"},  aux:"essere", pp:"stato"},
+  {inf:"dire",     pres:{io:"dico",   tu:"dici",  lui:"dice",  noi:"diciamo",  voi:"dite",    loro:"dicono"},  aux:"avere",  pp:"detto"},
+  {inf:"uscire",   pres:{io:"esco",   tu:"esci",  lui:"esce",  noi:"usciamo",  voi:"uscite",  loro:"escono"},  aux:"essere", pp:"uscito"},
+  {inf:"potere",   pres:{io:"posso",  tu:"puoi",  lui:"può",   noi:"possiamo", voi:"potete",  loro:"possono"}, aux:"avere",  pp:"potuto"},
+  {inf:"volere",   pres:{io:"voglio", tu:"vuoi",  lui:"vuole", noi:"vogliamo", voi:"volete",  loro:"vogliono"},aux:"avere",  pp:"voluto"},
+  {inf:"dovere",   pres:{io:"devo",   tu:"devi",  lui:"deve",  noi:"dobbiamo", voi:"dovete",  loro:"devono"},  aux:"avere",  pp:"dovuto"},
+  {inf:"sapere",   pres:{io:"so",     tu:"sai",   lui:"sa",    noi:"sappiamo", voi:"sapete",  loro:"sanno"},   aux:"avere",  pp:"saputo"},
+  {inf:"bere",     pres:{io:"bevo",   tu:"bevi",  lui:"beve",  noi:"beviamo",  voi:"bevete",  loro:"bevono"},  aux:"avere",  pp:"bevuto"},
+  {inf:"rimanere", pres:{io:"rimango",tu:"rimani",lui:"rimane",noi:"rimaniamo",voi:"rimanete",loro:"rimangono"},aux:"essere",pp:"rimasto"},
+  {inf:"tenere",   pres:{io:"tengo",  tu:"tieni", lui:"tiene", noi:"teniamo",  voi:"tenete",  loro:"tengono"}, aux:"avere",  pp:"tenuto"}
+];
+
+var PKEYS = ["io","tu","lui","noi","voi","loro"];
+var PRONOUN_LABELS = ["io","tu","lui/lei","noi","voi","loro"];
+/* Für die Aufgabe "ganze Konjugation" — bewusst nur die drei Grundverben. */
+var FULL_VERBS = VERBS.filter(function(v){ return v.inf==="essere" || v.inf==="avere" || v.inf==="stare"; });
+
+/* Subjekte für Passato Prossimo — mit explizitem Geschlecht/Numerus, damit die
+   Partizip-Angleichung bei essere-Verben eindeutig prüfbar ist. */
+var SUBJECTS = [
+  {label:"io",   name:"(Marco)",       key:"io",   gender:"m", number:"s"},
+  {label:"io",   name:"(Sara)",        key:"io",   gender:"f", number:"s"},
+  {label:"tu",   name:"(a Marco)",     key:"tu",   gender:"m", number:"s"},
+  {label:"tu",   name:"(a Sara)",      key:"tu",   gender:"f", number:"s"},
+  {label:"Marco",name:"",              key:"lui",  gender:"m", number:"s"},
+  {label:"Sara", name:"",              key:"lui",  gender:"f", number:"s"},
+  {label:"noi",  name:"(ragazzi)",     key:"noi",  gender:"m", number:"p"},
+  {label:"noi",  name:"(ragazze)",     key:"noi",  gender:"f", number:"p"},
+  {label:"voi",  name:"(ragazzi)",     key:"voi",  gender:"m", number:"p"},
+  {label:"voi",  name:"(ragazze)",     key:"voi",  gender:"f", number:"p"},
+  {label:"loro", name:"(i ragazzi)",   key:"loro", gender:"m", number:"p"},
+  {label:"loro", name:"(le ragazze)",  key:"loro", gender:"f", number:"p"}
+];
+
+/* ============ Zustand (nur Session, kein Local Storage) ============ */
+var state = {hp:60, xp:0, answered:0, correct:0, streak:0, fainted:false, catPres:0, catPass:0, evolved:false};
+var STAGE_NAMES = ["Baby","Kind","Jugendlich","Erwachsen","🏆 Meister"];
+var GROW_TARGET = 18;
+var MAX_XP = GROW_TARGET;
+var CAT_TARGET = 12;
+var SCOPE = "mix";
+var CURRENT_CAT = "pres";
+var lastEvolved = false;
+
+/* ============ Hilfsfunktionen ============ */
+function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function dedupe(a){var seen={},out=[];for(var i=0;i<a.length;i++){if(!seen[a[i]]){seen[a[i]]=1;out.push(a[i]);}}return out;}
+function stripAccents(s){return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
+function normalizeForm(s){return stripAccents(s).toLowerCase().trim().replace(/\s+/g," ");}
+function stageOf(){ if(state.evolved) return 4; return Math.min(3, Math.floor(state.xp/(GROW_TARGET/3))); }
+function conditionOf(){
+  if(state.fainted || state.hp<=0) return "dead";
+  var h=state.hp;
+  if(h>=90) return "thriving";
+  if(h>=75) return "happy";
+  if(h>=60) return "content";
+  if(h>=45) return "ok";
+  if(h>=33) return "queasy";
+  if(h>=20) return "sick";
+  if(h>=10) return "vomiting";
+  return "critical";
+}
+
+/* ============ Konjugations-Helfer ============ */
+var AUX_FORMS = {
+  avere:  {io:"ho",   tu:"hai",  lui:"ha",  noi:"abbiamo", voi:"avete",  loro:"hanno"},
+  essere: {io:"sono", tu:"sei",  lui:"è",   noi:"siamo",   voi:"siete",  loro:"sono"}
+};
+function auxForm(aux,key){ return AUX_FORMS[aux][key]; }
+function agree(pp,gender,number){
+  var stem=pp.slice(0,-1);
+  if(number==="p") return stem+(gender==="f"?"e":"i");
+  return stem+(gender==="f"?"a":"o");
+}
+function passatoForm(verb,subj){
+  var aux=auxForm(verb.aux,subj.key);
+  var part=verb.aux==="essere" ? agree(verb.pp,subj.gender,subj.number) : verb.pp;
+  return aux+" "+part;
+}
+
+/* ============ Zeichen-Helfer (kleine SVG-Bausteine) ============ */
+function blush(col,op){return '<circle cx="27" cy="63" r="6.5" fill="'+col+'" opacity="'+op+'"/><circle cx="83" cy="63" r="6.5" fill="'+col+'" opacity="'+op+'"/>';}
+function dotEyes(col){return '<circle cx="41" cy="53" r="4.8" fill="'+col+'"/><circle cx="69" cy="53" r="4.8" fill="'+col+'"/>';}
+function eyeShine(){return '<circle cx="42.7" cy="51.3" r="1.6" fill="#fff"/><circle cx="70.7" cy="51.3" r="1.6" fill="#fff"/>';}
+function starEyes(col){return '<circle cx="41" cy="52" r="6" fill="'+col+'"/><circle cx="69" cy="52" r="6" fill="'+col+'"/><circle cx="43" cy="50" r="2.1" fill="#fff"/><circle cx="71" cy="50" r="2.1" fill="#fff"/>';}
+function sparkle(x,y,sc){return '<g transform="translate('+x+' '+y+') scale('+sc+')"><path d="M0 -6 L1.6 -1.6 L6 0 L1.6 1.6 L0 6 L-1.6 1.6 L-6 0 L-1.6 -1.6 Z" fill="#fff59a"><animate attributeName="opacity" values="0.2;1;0.2" dur="1.6s" repeatCount="indefinite"/></path></g>';}
+function heart(x,y){return '<g transform="translate('+x+' '+y+')"><g><path d="M0 0 a2.6 2.6 0 0 1 5.2 0 a2.6 2.6 0 0 1 5.2 0 q0 3.4 -5.2 6.6 q-5.2 -3.2 -5.2 -6.6 Z" fill="#ff7aa8"/><animateTransform attributeName="transform" type="translate" values="0 0;0 -5;0 0" dur="2.4s" repeatCount="indefinite"/></g></g>';}
+function flower(x,y){var p='',i,a;for(i=0;i<5;i++){a=i*72*Math.PI/180;p+='<circle cx="'+(Math.cos(a)*4).toFixed(1)+'" cy="'+(Math.sin(a)*4).toFixed(1)+'" r="3" fill="#ffd1e8"/>';}return '<g transform="translate('+x+' '+y+')">'+p+'<circle cx="0" cy="0" r="2.3" fill="#ffb03a"/></g>';}
+function greenPuff(x,y,op){return '<circle cx="'+x+'" cy="'+y+'" r="7" fill="#8ad06a" opacity="'+op+'"/><circle cx="'+(x+6)+'" cy="'+(y+3)+'" r="4" fill="#8ad06a" opacity="'+(op*0.8)+'"/>';}
+function sweat(x,y){return '<path d="M'+x+' '+y+' q3 8 0 12 q-4 -4 0 -12" fill="#7fd6ff"><animate attributeName="opacity" values="1;0.3;1" dur="1.2s" repeatCount="indefinite"/></path>';}
+function vomit(){return '<path d="M50 76 q5 14 -2 26 q9 -3 14 2 q3 -16 -3 -28 Z" fill="#7bbf3a" opacity="0.9"/><ellipse cx="55" cy="114" rx="20" ry="5" fill="#7bbf3a" opacity="0.85"/><circle cx="45" cy="109" r="3" fill="#7bbf3a"/><circle cx="67" cy="111" r="2.5" fill="#7bbf3a"/>';}
+function motion(){return '<path d="M20 44 q-6 3 0 8" stroke="#7a8f4a" stroke-width="2" fill="none"/><path d="M92 46 q6 3 0 8" stroke="#7a8f4a" stroke-width="2" fill="none"/>';}
+function fly(x,y){return '<g><circle cx="'+x+'" cy="'+y+'" r="2" fill="#222"/><line x1="'+(x-3)+'" y1="'+(y-2)+'" x2="'+(x-1)+'" y2="'+y+'" stroke="#222" stroke-width="1"/><line x1="'+(x+3)+'" y1="'+(y-2)+'" x2="'+(x+1)+'" y2="'+y+'" stroke="#222" stroke-width="1"/><animateTransform attributeName="transform" type="translate" values="0 0;5 -4;-3 2;0 0" dur="1.1s" repeatCount="indefinite"/></g>';}
+function stink(x,y){return '<path d="M'+x+' '+y+' q3 -4 0 -8 q-3 -4 0 -8" stroke="#8a9c5a" stroke-width="2" fill="none" opacity="0.8"><animate attributeName="opacity" values="0.2;0.8;0.2" dur="1.5s" repeatCount="indefinite"/></path>';}
+function halo(){return '<ellipse cx="55" cy="10" rx="16" ry="5" fill="none" stroke="#ffe27a" stroke-width="3"><animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></ellipse>';}
+function wing(x,y,dir){return '<path d="M'+x+' '+y+' q'+(dir*16)+' -12 '+(dir*5)+' 16 q'+(dir*-3)+' -7 '+(dir*-5)+' -16 Z" fill="#f4f4f4" stroke="#d2d2d2" stroke-width="1"/>';}
+function goldWing(x,y,dir){return '<path d="M'+x+' '+y+' q'+(dir*22)+' -16 '+(dir*7)+' 22 q'+(dir*-4)+' -10 '+(dir*-7)+' -22 Z" fill="#ffe27a" stroke="#c99a1a" stroke-width="1.3"><animate attributeName="opacity" values="0.85;1;0.85" dur="1.8s" repeatCount="indefinite"/></path>';}
+function soul(){return '<g><path d="M49 42 q6 -12 12 0 q0 9 -6 9 q-6 0 -6 -9 Z" fill="#e2f4ff" stroke="#bcdff0" stroke-width="1"/><circle cx="52" cy="42" r="1" fill="#6cf"/><circle cx="58" cy="42" r="1" fill="#6cf"/><animateTransform attributeName="transform" type="translate" values="0 0;0 -14;0 0" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.9;0.35;0.9" dur="3s" repeatCount="indefinite"/></g>';}
+function tomb(){return '<g transform="translate(80 78)"><rect x="0" y="4" width="22" height="30" rx="10" fill="#9aa0a6" stroke="#767b80" stroke-width="1.5"/><line x1="11" y1="11" x2="11" y2="25" stroke="#5f6469" stroke-width="2.2"/><line x1="5" y1="16" x2="17" y2="16" stroke="#5f6469" stroke-width="2.2"/></g>';}
+
+/* ============ Sprite zeichnen (Inline-SVG) ============ */
+function buildSprite(stage, cond){
+  var sizes=[100,120,140,160,205];
+  var s=sizes[stage];
+  var P={
+    thriving:{body:"#5fe0c0",belly:"#eafff9",cheek:"#ff8fbf"},
+    happy:   {body:"#6ed9c4",belly:"#dcf7ee",cheek:"#f79ec0"},
+    content: {body:"#7fd6c4",belly:"#d5f3ea",cheek:"#f2a6a0"},
+    ok:      {body:"#8ccabb",belly:"#dfeee7",cheek:"#e6b0a8"},
+    queasy:  {body:"#b7cf8f",belly:"#e6efd6",cheek:"#aab06a"},
+    sick:    {body:"#9fbf78",belly:"#dbe7c6",cheek:"#8f9a54"},
+    vomiting:{body:"#8ab568",belly:"#cfe0b0",cheek:"#7a8f4a"},
+    critical:{body:"#87996f",belly:"#bccaa6",cheek:"#6b7a49"},
+    dead:    {body:"#b3b3b3",belly:"#dadada",cheek:"#c2c2c2"}
+  };
+  var c=P[cond]||P.ok, body=c.body, belly=c.belly, cheek=c.cheek;
+  var back="", eyes="", mouth="", front="", crown="", lean="";
+
+  if(cond==="thriving"){
+    back='<circle cx="55" cy="60" r="53" fill="#fff2b0" opacity="0.45"><animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite"/></circle>';
+    eyes=starEyes("#204039");
+    mouth='<path d="M42 64 q13 18 26 0 q-13 7 -26 0 Z" fill="#e26a8d" stroke="#204039" stroke-width="2.5" stroke-linejoin="round"/>';
+    front=blush(cheek,0.9)+sparkle(20,26,1.1)+sparkle(92,30,0.9)+sparkle(86,74,0.7)+heart(12,42)+heart(96,50)+flower(28,104)+flower(82,104);
+  } else if(cond==="happy"){
+    eyes='<path d="M35 52 q6 -8 12 0" stroke="#204039" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M63 52 q6 -8 12 0" stroke="#204039" stroke-width="3.5" fill="none" stroke-linecap="round"/>';
+    mouth='<path d="M44 65 q11 14 22 0" stroke="#204039" stroke-width="3.5" fill="#e88" stroke-linecap="round"/>';
+    front=blush(cheek,0.75)+sparkle(22,30,0.9)+sparkle(90,34,0.8);
+  } else if(cond==="content"){
+    eyes=dotEyes("#204039")+eyeShine();
+    mouth='<path d="M45 67 q10 8 20 0" stroke="#204039" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    front=blush(cheek,0.5)+sparkle(24,32,0.6);
+  } else if(cond==="ok"){
+    eyes=dotEyes("#204039");
+    mouth='<path d="M46 68 q9 5 18 0" stroke="#204039" stroke-width="3" fill="none" stroke-linecap="round"/>';
+  } else if(cond==="queasy"){
+    eyes='<circle cx="41" cy="55" r="4.5" fill="#333"/><circle cx="69" cy="55" r="4.5" fill="#333"/><path d="M34 48 q7 -3 13 1" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M63 49 q7 -4 13 -1" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+    mouth='<path d="M45 70 q10 -5 20 0" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    front=greenPuff(80,60,0.55);
+  } else if(cond==="sick"){
+    eyes='<path d="M35 54 q6 4 12 0" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M63 54 q6 4 12 0" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    mouth='<path d="M44 70 q5 -4 10 0 q5 4 10 0" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    front=sweat(76,50)+greenPuff(82,62,0.85);
+  } else if(cond==="vomiting"){
+    eyes='<path d="M35 50 l10 8 M45 50 l-10 8" stroke="#333" stroke-width="3" stroke-linecap="round"/><path d="M63 50 l10 8 M73 50 l-10 8" stroke="#333" stroke-width="3" stroke-linecap="round"/>';
+    mouth='<ellipse cx="55" cy="72" rx="8" ry="6" fill="#3a2b1a"/>';
+    front=vomit()+sweat(74,48)+motion();
+    lean=' transform="rotate(-4 55 70)"';
+  } else if(cond==="critical"){
+    eyes='<text x="31" y="59" font-size="15" fill="#333" font-family="monospace">@</text><text x="62" y="59" font-size="15" fill="#333" font-family="monospace">@</text>';
+    mouth='<path d="M45 73 q10 -3 20 0" stroke="#333" stroke-width="2.5" fill="none"/><path d="M61 72 l6 8" stroke="#c0392b" stroke-width="3" stroke-linecap="round"/>';
+    front=fly(18,30)+fly(92,40)+stink(30,20)+stink(74,18);
+    lean=' transform="rotate(-8 55 70)"';
+  } else {
+    eyes='<path d="M34 50 l10 10 M44 50 l-10 10" stroke="#555" stroke-width="3" stroke-linecap="round"/><path d="M66 50 l10 10 M76 50 l-10 10" stroke="#555" stroke-width="3" stroke-linecap="round"/>';
+    mouth='<path d="M46 72 q9 0 18 0" stroke="#555" stroke-width="3" stroke-linecap="round"/><path d="M61 72 l5 7" stroke="#888" stroke-width="3" stroke-linecap="round"/>';
+    back=halo()+wing(8,60,1)+wing(102,60,-1);
+    front=soul()+tomb();
+  }
+
+  var wears=(cond==="thriving"||cond==="happy"||cond==="content"||cond==="ok"||cond==="queasy"||cond==="sick");
+  if(wears){
+    if(stage===3){ crown='<path d="M40 22 l5 -12 l6 8 l4 -12 l4 12 l6 -8 l5 12 Z" fill="#f0c02c" stroke="#c99a1a" stroke-width="1.5"/><circle cx="55" cy="9" r="3" fill="#e0533f"/>'; }
+    else if(stage>=2 && stage<4){ crown='<path d="M42 22 l6 -10 l7 8 l7 -8 l6 10 Z" fill="#f0a92c" stroke="#c9861a" stroke-width="1.5"/>'; }
+    else if(stage>=1 && stage<4){ crown='<path d="M45 20 q10 -6 20 0" stroke="#6bbf5c" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="55" cy="16" r="3.5" fill="#6bbf5c"/>'; }
+  }
+  var isMaster = (stage>=4 && cond!=="dead");
+  if(isMaster && wears){ back += masterAura(); }
+
+  var vb = isMaster ? "-30 -22 170 170" : "0 0 110 122";
+  var defs = isMaster ? '<defs><linearGradient id="iridescent" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5fe0c0"/><stop offset="45%" stop-color="#ffe27a"/><stop offset="100%" stop-color="#ff8fbf"/></linearGradient></defs>' : '';
+  var svg='<svg width="'+s+'" height="'+s+'" viewBox="'+vb+'" xmlns="http://www.w3.org/2000/svg" style="transition:width 0.4s,height 0.4s;">'+defs;
+  svg+=back;
+  svg+='<g'+lean+'>';
+  if(isMaster){
+    svg+=masterBody(body, belly, wears);
+  } else {
+    var bodyFns=[bodyBaby, bodyChild, bodyTeen, bodyAdult];
+    svg+=bodyFns[stage](body, belly);
+  }
+  svg+=crown+eyes+(stage>=2 ? '' : mouth);
+  svg+='</g>';
+  svg+=front;
+  svg+='</svg>';
+  return svg;
+}
+
+/* ============ Wachstumslinie: vier eigenständige Gestalten (Ei-Küken → Eulenküken → Jungeule → Alteule) ============ */
+function bodyBaby(body,belly){
+  var g='';
+  /* winzige Flügelstummel */
+  g+='<ellipse cx="18" cy="74" rx="7" ry="11" fill="'+body+'" transform="rotate(18 18 74)"/>';
+  g+='<ellipse cx="92" cy="74" rx="7" ry="11" fill="'+body+'" transform="rotate(-18 92 74)"/>';
+  /* rundlicher, eiförmiger Körper */
+  g+='<ellipse cx="55" cy="68" rx="37" ry="38" fill="'+body+'"/>';
+  g+='<ellipse cx="55" cy="76" rx="23" ry="22" fill="'+belly+'"/>';
+  /* winzige Füßchen */
+  g+='<ellipse cx="43" cy="102" rx="8" ry="5" fill="'+body+'"/><ellipse cx="67" cy="102" rx="8" ry="5" fill="'+body+'"/>';
+  /* einzelne Flaumfeder oben — frisch geschlüpft */
+  g+='<path d="M52 26 q3 -12 6 -1 q3 -11 5 1 Z" fill="'+body+'"/>';
+  return g;
+}
+function bodyChild(body,belly){
+  var g='';
+  /* kleine Flügel */
+  g+='<path d="M17 60 q-15 -3 -15 18 q11 5 15 -6 Z" fill="'+body+'"/>';
+  g+='<path d="M93 60 q15 -3 15 18 q-11 5 -15 -6 Z" fill="'+body+'"/>';
+  /* rundes Eulenküken */
+  g+='<ellipse cx="55" cy="66" rx="40" ry="40" fill="'+body+'"/>';
+  g+='<ellipse cx="55" cy="73" rx="25" ry="25" fill="'+belly+'"/>';
+  /* erste kleine Ohrbüschel-Ansätze */
+  g+='<path d="M38 28 q-2 -9 6 -11 q-1 7 2 13 Z" fill="'+body+'"/>';
+  g+='<path d="M72 28 q2 -9 -6 -11 q1 7 -2 13 Z" fill="'+body+'"/>';
+  /* Füße */
+  g+='<ellipse cx="42" cy="102" rx="10" ry="6" fill="'+body+'"/><ellipse cx="68" cy="102" rx="10" ry="6" fill="'+body+'"/>';
+  return g;
+}
+function bodyTeen(body,belly){
+  var g='';
+  /* angelegte Flügel mit Federstrich */
+  g+='<path d="M14 50 q-16 10 -8 42 q14 -2 18 -27 Z" fill="'+body+'"/>';
+  g+='<path d="M96 50 q16 10 8 42 q-14 -2 -18 -27 Z" fill="'+body+'"/>';
+  g+='<path d="M12 62 q6 15 12 25" stroke="'+belly+'" stroke-width="2" fill="none" opacity="0.6"/>';
+  g+='<path d="M98 62 q-6 15 -12 25" stroke="'+belly+'" stroke-width="2" fill="none" opacity="0.6"/>';
+  /* eulenartiger, tropfenförmiger Körper */
+  g+='<path d="M55 20 C76 20 88 42 88 66 C88 92 74 108 55 108 C36 108 22 92 22 66 C22 42 34 20 55 20 Z" fill="'+body+'"/>';
+  g+='<ellipse cx="55" cy="70" rx="24" ry="27" fill="'+belly+'"/>';
+  /* kleine Ohrbüschel */
+  g+='<path d="M38 24 q-5 -11 4 -15 q2 9 -2 17 Z" fill="'+body+'"/>';
+  g+='<path d="M72 24 q5 -11 -4 -15 q-2 9 2 17 Z" fill="'+body+'"/>';
+  /* Schnäbelchen */
+  g+='<path d="M51 62 q4 6 8 0 q-4 5 -8 0 Z" fill="#e0a542"/>';
+  /* Füße mit kleinen Krallen */
+  g+='<ellipse cx="42" cy="104" rx="10" ry="6" fill="'+body+'"/><ellipse cx="68" cy="104" rx="10" ry="6" fill="'+body+'"/>';
+  return g;
+}
+function bodyAdult(body,belly){
+  var g='';
+  /* große, klar gefiederte Flügel */
+  g+='<path d="M12 46 q-22 14 -10 54 q18 -4 22 -35 Z" fill="'+body+'"/>';
+  g+='<path d="M98 46 q22 14 10 54 q-18 -4 -22 -35 Z" fill="'+body+'"/>';
+  g+='<path d="M10 62 q8 18 16 31 M14 78 q6 13 12 21" stroke="'+belly+'" stroke-width="2" fill="none" opacity="0.55"/>';
+  g+='<path d="M100 62 q-8 18 -16 31 M96 78 q-6 13 -12 21" stroke="'+belly+'" stroke-width="2" fill="none" opacity="0.55"/>';
+  /* Gesichtsschleier + kräftiger Eulenkörper */
+  g+='<path d="M55 14 C80 14 94 38 94 64 C94 94 76 112 55 112 C34 112 16 94 16 64 C16 38 30 14 55 14 Z" fill="'+body+'"/>';
+  g+='<ellipse cx="55" cy="70" rx="27" ry="30" fill="'+belly+'"/>';
+  /* markante Ohrbüschel */
+  g+='<path d="M36 22 q-9 -17 4 -23 q4 13 -2 25 Z" fill="'+body+'"/>';
+  g+='<path d="M74 22 q9 -17 -4 -23 q-4 13 2 25 Z" fill="'+body+'"/>';
+  /* kräftiger Schnabel */
+  g+='<path d="M49 64 q6 8 12 0 q-6 6 -12 0 Z" fill="#d69436"/>';
+  /* Krallenfüße */
+  g+='<ellipse cx="40" cy="106" rx="11" ry="6" fill="'+body+'"/><ellipse cx="70" cy="106" rx="11" ry="6" fill="'+body+'"/>';
+  g+='<path d="M34 108 l-3 5 M40 110 l0 6 M46 108 l3 5" stroke="#d69436" stroke-width="1.5" fill="none"/>';
+  g+='<path d="M64 108 l3 5 M70 110 l0 6 M76 108 l-3 5" stroke="#d69436" stroke-width="1.5" fill="none"/>';
+  return g;
+}
+/* ============ Meister-Silhouette: ein sichtbar ANDERES Wesen (nicht nur Deko) ============ */
+function masterBody(body, belly, wears){
+  var fillMain = wears ? "url(#iridescent)" : body;
+  var g='';
+  /* Sternschweif */
+  g+='<path d="M84 96 q20 8 14 30 q-9 -5 -15 -12 q2 9 8 17 q-16 -4 -17 -24 q1 -7 10 -11 Z" fill="'+fillMain+'"/>';
+  g+='<g transform="translate(101 138) scale(1.3)">'+flower(0,0)+'</g>';
+  /* Fest angewachsene Flügel */
+  g+='<path d="M16 56 q-30 -10 -34 22 q18 8 34 -6 q2 -8 0 -16 Z" fill="'+fillMain+'" stroke="#e0be4a" stroke-width="1.6"/>';
+  g+='<path d="M94 56 q30 -10 34 22 q-18 8 -34 -6 q-2 -8 0 -16 Z" fill="'+fillMain+'" stroke="#e0be4a" stroke-width="1.6"/>';
+  /* Spitze Ohren statt runder Ohren */
+  g+='<path d="M22 42 q-16 -22 0 -38 q11 11 11 32 Z" fill="'+fillMain+'"/>';
+  g+='<path d="M88 42 q16 -22 0 -38 q-11 11 -11 32 Z" fill="'+fillMain+'"/>';
+  /* Beine */
+  g+='<ellipse cx="40" cy="104" rx="12" ry="7" fill="'+fillMain+'"/><ellipse cx="70" cy="104" rx="12" ry="7" fill="'+fillMain+'"/>';
+  /* Edelstein-förmiger Körper statt einfachem Oval */
+  g+='<path d="M55 14 C82 14 94 40 94 64 C94 92 76 110 55 110 C34 110 16 92 16 64 C16 40 28 14 55 14 Z" fill="'+fillMain+'"/>';
+  g+='<ellipse cx="55" cy="70" rx="28" ry="29" fill="'+belly+'"/>';
+  /* Stirn-Edelstein */
+  g+='<path d="M55 20 l6 8 l-6 8 l-6 -8 Z" fill="#ffe27a" stroke="#c99a1a" stroke-width="1.2"><animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite"/></path>';
+  return g;
+}
+function masterAura(){
+  var g='<g transform="translate(55 62)"><ellipse rx="72" ry="72" fill="none" stroke="#ffe27a" stroke-width="2.2" opacity="0.3"><animate attributeName="opacity" values="0.12;0.45;0.12" dur="2.4s" repeatCount="indefinite"/></ellipse></g>';
+  g+=sparkle(2,10,1.0)+sparkle(108,14,1.0)+sparkle(112,100,0.85)+sparkle(-2,100,0.85)+sparkle(55,-16,0.8);
+  return g;
+}
+
+/* ============ Render ============ */
+var MOOD_MSG={
+  thriving:"🌟 Dein Wesen strahlt vor Gesundheit – einfach wunderschön!",
+  happy:"😍 Deinem Wesen geht es prächtig – weiter so!",
+  content:"😊 Deinem Wesen geht es gut.",
+  ok:"🙂 Alles im grünen Bereich.",
+  queasy:"😕 Deinem Wesen wird flau – konjugiere richtig!",
+  sick:"🤢 Dein Wesen ist krank geworden! Schnell, die richtige Form!",
+  vomiting:"🤮 Deinem Wesen ist speiübel – es braucht dringend richtige Antworten!",
+  critical:"💀 Dein Wesen liegt im Sterben! Nur eine richtige Konjugation rettet es jetzt!",
+  dead:"⚰️ Dein Wesen ist gestorben! Belebe es mit einer richtigen Antwort wieder!"
+};
+function hpColor(h){
+  if(h>=60) return "#3fae7a";
+  if(h>=45) return "#8bbf3a";
+  if(h>=33) return "#e6a12c";
+  if(h>=20) return "#e07b2c";
+  if(h>=10) return "#e0533f";
+  return "#b02a1a";
+}
+function render(){
+  var stage=stageOf(), cond=conditionOf();
+  document.getElementById("sprite").innerHTML=buildSprite(stage,cond);
+  document.getElementById("stageLabel").innerText=STAGE_NAMES[stage];
+  document.getElementById("hpTxt").innerText=state.hp;
+  document.getElementById("hpBar").style.width=state.hp+"%";
+  document.getElementById("hpBar").style.background=hpColor(state.hp);
+  document.getElementById("xpTxt").innerText=state.xp+"/"+MAX_XP;
+  document.getElementById("xpBar").style.width=Math.round(state.xp/MAX_XP*100)+"%";
+  document.getElementById("catPresTxt").innerText=state.catPres+"/"+CAT_TARGET;
+  document.getElementById("catPresBar").style.width=Math.round(state.catPres/CAT_TARGET*100)+"%";
+  document.getElementById("catPassTxt").innerText=state.catPass+"/"+CAT_TARGET;
+  document.getElementById("catPassBar").style.width=Math.round(state.catPass/CAT_TARGET*100)+"%";
+  document.getElementById("masteryRow").style.display=(SCOPE==="mix")?"flex":"none";
+  document.getElementById("scoreLine").innerText="Beantwortet: "+state.answered+" · Richtig: "+state.correct+" · Serie: "+state.streak;
+  document.getElementById("mood").innerText=MOOD_MSG[cond]||"";
+}
+function flashReaction(txt){
+  var r=document.getElementById("reaction");
+  r.innerText=txt; r.style.opacity="1";
+  setTimeout(function(){r.style.opacity="0";},900);
+}
+function pulseSprite(kind){
+  var s=document.getElementById("sprite");
+  if(!s) return;
+  if(kind==="good"){
+    s.style.transform="scale(1.13) translateY(-7px)";
+    setTimeout(function(){s.style.transform="none";},260);
+  } else {
+    s.style.transform="translateX(-6px)";
+    setTimeout(function(){s.style.transform="translateX(6px)";},80);
+    setTimeout(function(){s.style.transform="translateX(-3px)";},160);
+    setTimeout(function(){s.style.transform="none";},240);
+  }
+}
+
+/* ============ Belohnung / Strafe ============ */
+function reward(){
+  lastEvolved=false;
+  var wasDead=state.fainted || state.hp<=0;
+  state.correct++; state.streak++;
+  if(wasDead){
+    state.hp=45; state.fainted=false;
+    flashReaction("💖✨");
+  } else {
+    var bonus = state.streak>=3 ? 12 : 9;
+    state.hp=Math.min(100, state.hp+bonus);
+    flashReaction(state.hp>=90 ? "✨" : "💚");
+  }
+  state.xp=Math.min(MAX_XP, state.xp+1);
+  if(CURRENT_CAT==="pres") state.catPres=Math.min(CAT_TARGET, state.catPres+1);
+  else if(CURRENT_CAT==="pass") state.catPass=Math.min(CAT_TARGET, state.catPass+1);
+  if(!state.evolved && state.catPres>=CAT_TARGET && state.catPass>=CAT_TARGET){
+    state.evolved=true; state.hp=100; state.xp=MAX_XP; lastEvolved=true;
+    fireworks();
+  }
+  pulseSprite("good");
+}
+function penalty(){
+  state.streak=0;
+  state.hp=Math.max(0, state.hp-12);
+  if(state.hp===0) state.fainted=true;
+  flashReaction(state.fainted ? "💀" : (state.hp<20 ? "🤮" : "💔"));
+  pulseSprite("bad");
+}
+/* ============ Feuerwerk bei Erreichen der Meister-Stufe: startende und explodierende Raketen (reines SVG-SMIL) ============ */
+function fireworks(){
+  var host=document.getElementById("sprite"); if(!host) return;
+  host=host.parentNode; if(!host) return;
+  var uid="fw"+Math.floor(Math.random()*1000000);
+  var colors=[THEME_PRES.strong, THEME_PASS.strong, "#ffd93d", "#ff6b9d", "#5fa8ff", "#ff8c42", "#8a6bff", "#3fe0c0"];
+  var rockets=[
+    {x:10,  burstY:26, delay:0.00},
+    {x:34,  burstY:12, delay:0.30},
+    {x:58,  burstY:20, delay:0.60},
+    {x:82,  burstY:10, delay:0.90},
+    {x:100, burstY:30, delay:1.20},
+    {x:22,  burstY:16, delay:1.50},
+    {x:70,  burstY:24, delay:1.80}
+  ];
+  var launchY=124, flightDur=0.5;
+  var svg='<svg id="'+uid+'" viewBox="0 0 110 122" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:visible;">';
+  rockets.forEach(function(r,idx){
+    var col=colors[idx%colors.length];
+    var col2=colors[(idx+3)%colors.length];
+    var riseDist=(launchY-r.burstY).toFixed(1);
+    var beginRocket=r.delay.toFixed(2)+"s";
+    var beginBurst=(r.delay+flightDur).toFixed(2)+"s";
+    /* Rakete: Lichtpunkt + Schweif, steigt auf und verlischt am Explosionspunkt */
+    svg+='<circle cx="'+r.x+'" cy="'+launchY+'" r="2.4" fill="'+col+'">'+
+         '<animateTransform attributeName="transform" type="translate" from="0 0" to="0 -'+riseDist+'" begin="'+beginRocket+'" dur="'+flightDur+'s" fill="freeze"/>'+
+         '<animate attributeName="opacity" values="1;1;0" begin="'+beginRocket+'" dur="'+flightDur+'s" fill="freeze"/>'+
+         '</circle>';
+    svg+='<circle cx="'+r.x+'" cy="'+launchY+'" r="1.2" fill="#fff8d0" opacity="0.85">'+
+         '<animateTransform attributeName="transform" type="translate" from="0 6" to="0 -'+(riseDist-10)+'" begin="'+beginRocket+'" dur="'+flightDur+'s" fill="freeze"/>'+
+         '<animate attributeName="opacity" values="0.85;0.5;0" begin="'+beginRocket+'" dur="'+flightDur+'s" fill="freeze"/>'+
+         '</circle>';
+    /* Blitz beim Zünden */
+    svg+='<circle cx="'+r.x+'" cy="'+r.burstY+'" r="1" fill="#fff">'+
+         '<animate attributeName="r" values="1;16;1" begin="'+beginBurst+'" dur="0.22s" fill="freeze"/>'+
+         '<animate attributeName="opacity" values="1;0.6;0" begin="'+beginBurst+'" dur="0.22s" fill="freeze"/>'+
+         '</circle>';
+    /* Explosion: viele Partikel strahlen kräftig nach außen */
+    var n=18, dist=30+(idx%3)*8;
+    for(var i=0;i<n;i++){
+      var ang=(i/n)*2*Math.PI+(idx*0.27);
+      var dx=(Math.cos(ang)*dist).toFixed(1), dy=(Math.sin(ang)*dist).toFixed(1);
+      var pcol=(i%2===0)?col:col2;
+      svg+='<circle cx="'+r.x+'" cy="'+r.burstY+'" r="2.8" fill="'+pcol+'">'+
+           '<animateTransform attributeName="transform" type="translate" from="0 0" to="'+dx+' '+dy+'" begin="'+beginBurst+'" dur="1.05s" fill="freeze"/>'+
+           '<animate attributeName="opacity" values="0;1;0" begin="'+beginBurst+'" dur="1.05s" fill="freeze"/>'+
+           '<animate attributeName="r" values="2.8;2.2;0.3" begin="'+beginBurst+'" dur="1.05s" fill="freeze"/>'+
+           '</circle>';
+    }
+  });
+  svg+='</svg>';
+  var wrap=document.createElement("div");
+  wrap.innerHTML=svg;
+  host.appendChild(wrap.firstChild);
+  setTimeout(function(){ var el=document.getElementById(uid); if(el&&el.parentNode) el.parentNode.removeChild(el); }, 3600);
+}
+function evolutionBanner(){
+  return '<div style="background:#fff3d6; border:2px solid #f0a92c; border-radius:10px; padding:9px 10px; margin-bottom:8px; font-weight:800; color:#8a4b12; font-size:13px; text-align:center;">🏆🎉 Meister-Stufe erreicht! Presente <b>und</b> Passato Prossimo gemeistert!</div>';
+}
+
+/* ============ Aufgaben-Hilfsfunktionen ============ */
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function setMode(t){document.getElementById("modeLabel").innerText=t;}
+function setBody(h){document.getElementById("taskBody").innerHTML=h;}
+/* ============ Visuelle "Signatur" je Zeitform & Aufgabentyp ============
+   Ziel: Schüler:innen erkennen die Aufgabenform bald am Design (Farbe/Icon/
+   Kachelform), ohne den Text lesen zu müssen. Presente = Grün/Sonne, oben
+   abgerundet. Passato Prossimo = Bernstein/Sanduhr, eckiger ("älter"). */
+var THEME_PRES = {name:"PRESENTE", icon:"☀️", strong:"#2f8a54", soft:"#e9f8ef", radius:"18px"};
+var THEME_PASS = {name:"PASSATO PROSSIMO", icon:"⌛", strong:"#b26a1a", soft:"#fdeecb", radius:"6px"};
+var KIND_MC    = {icon:"☑️", label:"Multiple Choice"};
+var KIND_TYPE  = {icon:"⌨️", label:"Eintippen"};
+var KIND_MATCH = {icon:"🔗", label:"Zuordnen"};
+
+function optStyle(theme){return 'display:block; width:100%; text-align:left; margin:6px 0; padding:11px 14px 11px 14px; border-radius:10px; border:1.5px solid '+theme.strong+'; border-left:7px solid '+theme.strong+'; background:'+theme.soft+'; color:#2b3a36; font-size:15px; cursor:pointer; font-family:inherit;';}
+
+/* Aufgaben-Kachel: farbiger Kopfbalken (Zeitform-Icon + Name) + weißer
+   Kind-Badge (Aufgabentyp) oben, darunter groß Subjekt + Infinitiv-Chip.
+   Kopfbalkenfarbe und Eckenradius sind die Wiedererkennungs-Signatur. */
+function promptBox(theme, kind, subj, inf, note){
+  return '<div style="background:'+theme.soft+'; border:2.5px solid '+theme.strong+'; border-radius:'+theme.radius+'; margin-bottom:14px; overflow:hidden;">'+
+    '<div style="display:flex; align-items:center; justify-content:space-between; background:'+theme.strong+'; padding:7px 12px;">'+
+      '<span style="font-weight:800; color:#fff; font-size:12.5px; letter-spacing:.04em;">'+theme.icon+' '+esc(theme.name)+'</span>'+
+      '<span style="font-size:11px; font-weight:700; color:'+theme.strong+'; background:#fff; border-radius:20px; padding:3px 10px; white-space:nowrap;">'+kind.icon+' '+esc(kind.label)+'</span>'+
+    '</div>'+
+    '<div style="text-align:center; padding:14px 12px 12px;">'+
+      '<div style="font-size:26px; font-weight:800; color:#2b3a36; line-height:1.25;">'+esc(subj)+'</div>'+
+      '<div style="margin-top:6px;"><span style="display:inline-block; background:#ffffff; border:1.5px solid '+theme.strong+'; border-radius:8px; padding:4px 14px; font-size:18px; font-weight:700; color:'+theme.strong+';">'+esc(inf)+'</span></div>'+
+      (note?'<div style="font-size:11.5px; color:#8a7a5c; margin-top:8px;">'+note+'</div>':'')+
+    '</div>'+
+    '</div>';
+}
+/* Gleiche Kopfbalken-Signatur für die Zuordnung, die kein einzelnes Subjekt hat. */
+function themedHeader(theme, kind){
+  return '<div style="display:flex; align-items:center; justify-content:space-between; background:'+theme.strong+'; padding:7px 12px; border-radius:'+theme.radius+' '+theme.radius+' 0 0; margin:-2px -2px 0;">'+
+    '<span style="font-weight:800; color:#fff; font-size:12.5px; letter-spacing:.04em;">'+theme.icon+' '+esc(theme.name)+'</span>'+
+    '<span style="font-size:11px; font-weight:700; color:'+theme.strong+'; background:#fff; border-radius:20px; padding:3px 10px; white-space:nowrap;">'+kind.icon+' '+esc(kind.label)+'</span>'+
+    '</div>';
+}
+function continueBtn(){return '<button onclick="nextTask()" style="margin-left:6px; padding:6px 14px; border-radius:8px; border:none; background:#3a2c14; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">Weiter →</button>';}
+var currentAnswer=null;
+
+/* ---- Modus-Rotation ---- */
+var MODES=[], modePtr=-1;
+function initModesForScope(){
+  var presModes=["mcPres","typePres","matchPres","fullPres"];
+  var passModes=["mcPass","typePass","matchPass","fullPass"];
+  if(SCOPE==="presente") MODES=presModes.slice();
+  else if(SCOPE==="passato") MODES=passModes.slice();
+  else {
+    MODES=[];
+    for(var i=0;i<presModes.length;i++){ MODES.push(presModes[i]); MODES.push(passModes[i]); }
+  }
+}
+function nextTask(){
+  document.getElementById("feedback").innerHTML="";
+  modePtr=(modePtr+1)%MODES.length;
+  var m=MODES[modePtr];
+  if(m==="mcPres") buildMcPres();
+  else if(m==="typePres") buildTypePres();
+  else if(m==="matchPres") buildMatchPres();
+  else if(m==="fullPres") buildFullPres();
+  else if(m==="mcPass") buildMcPass();
+  else if(m==="typePass") buildTypePass();
+  else if(m==="matchPass") buildMatchPass();
+  else buildFullPass();
+}
+
+/* ---- 1) Multiple Choice — Presente ---- */
+function buildMcPres(){
+  CURRENT_CAT="pres";
+  setMode("Presente — wähle die richtige Form");
+  var verb=pick(VERBS), key=pick(PKEYS);
+  currentAnswer={value:verb.pres[key]};
+  var pool=[];
+  PKEYS.forEach(function(k){ if(k!==key) pool.push(verb.pres[k]); });
+  VERBS.forEach(function(v){ if(v.inf!==verb.inf) pool.push(v.pres[key]); });
+  pool=dedupe(pool.filter(function(w){return w!==verb.pres[key];}));
+  var wrong=shuffle(pool).slice(0,3);
+  var opts=shuffle([verb.pres[key]].concat(wrong));
+  var label=PRONOUN_LABELS[PKEYS.indexOf(key)];
+  var html=promptBox(THEME_PRES, KIND_MC, label, verb.inf);
+  for(var i=0;i<opts.length;i++){
+    html+='<button onclick="answerMcPres(this,\''+encodeURIComponent(opts[i])+'\')" style="'+optStyle(THEME_PRES)+'">'+esc(opts[i])+'</button>';
+  }
+  setBody(html);
+}
+function answerMcPres(btn,enc){
+  var chosen=decodeURIComponent(enc), fb=document.getElementById("feedback");
+  var bs=btn.parentNode.getElementsByTagName("button");
+  for(var i=0;i<bs.length;i++){bs[i].onclick=null; bs[i].style.cursor="default";}
+  if(chosen===currentAnswer.value){ btn.style.background="#d7f0dd"; btn.style.borderColor="#3fae7a"; reward();
+    fb.innerHTML=(lastEvolved?evolutionBanner():'')+'<span style="color:#2f8a54; font-weight:600;">✓ Giusto!</span> '+continueBtn();
+  } else { btn.style.background="#f7dcd7"; btn.style.borderColor="#e0533f"; penalty();
+    fb.innerHTML='<span style="color:#c0392b; font-weight:600;">✗ Non è corretto.</span> Richtig: <b>'+esc(currentAnswer.value)+'</b> '+continueBtn(); }
+  state.answered++; render();
+}
+
+/* ---- 2) Freies Eintippen — Presente ---- */
+function buildTypePres(){
+  CURRENT_CAT="pres";
+  setMode("Presente — schreibe die richtige Form");
+  var verb=pick(VERBS), key=pick(PKEYS);
+  currentAnswer={value:verb.pres[key]};
+  var label=PRONOUN_LABELS[PKEYS.indexOf(key)];
+  var html=promptBox(THEME_PRES, KIND_TYPE, label, verb.inf)+
+    '<input id="typeInput" type="text" autocomplete="off" onkeydown="if(event.key===\'Enter\'){checkTypePres();}" '+
+    'style="width:100%; box-sizing:border-box; padding:12px 14px; border-radius:10px; border:2px solid '+THEME_PRES.strong+'; font-size:16px; font-family:inherit; text-align:center;" placeholder="forma del presente ...">'+
+    '<button onclick="checkTypePres()" style="display:block; width:100%; margin-top:10px; padding:11px; border-radius:10px; border:none; background:'+THEME_PRES.strong+'; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit;">Prüfen</button>';
+  setBody(html);
+  document.getElementById("typeInput").focus();
+}
+function checkTypePres(){
+  var inp=document.getElementById("typeInput");
+  if(!inp || inp.disabled) return;
+  var val=normalizeForm(inp.value); if(val==="") return;
+  var fb=document.getElementById("feedback"); inp.disabled=true;
+  if(val===normalizeForm(currentAnswer.value)){ inp.style.borderColor="#3fae7a"; inp.style.background="#eafbef"; reward();
+    fb.innerHTML=(lastEvolved?evolutionBanner():'')+'<span style="color:#2f8a54; font-weight:600;">✓ Giusto!</span> <span style="color:#8a7a5c;">('+esc(currentAnswer.value)+')</span> '+continueBtn();
+  } else { inp.style.borderColor="#e0533f"; inp.style.background="#fdeeeb"; penalty();
+    fb.innerHTML='<span style="color:#c0392b; font-weight:600;">✗ Non proprio.</span> Richtig: <b>'+esc(currentAnswer.value)+'</b> '+continueBtn(); }
+  state.answered++; render();
+}
+
+/* ---- 3) Multiple Choice — Passato Prossimo ---- */
+function buildMcPass(){
+  CURRENT_CAT="pass";
+  setMode("Passato Prossimo — wähle die richtige Form");
+  var verb=pick(VERBS), subj=pick(SUBJECTS);
+  var correct=passatoForm(verb,subj);
+  currentAnswer={value:correct};
+  var wrongSet=[];
+  function addWrong(f){ if(f!==correct && wrongSet.indexOf(f)===-1) wrongSet.push(f); }
+  var wrongAux = verb.aux==="essere" ? "avere" : "essere";
+  addWrong(auxForm(wrongAux,subj.key)+" "+(wrongAux==="essere" ? agree(verb.pp,subj.gender,subj.number) : verb.pp));
+  if(verb.aux==="essere"){
+    var flipG=subj.gender==="m"?"f":"m";
+    addWrong(auxForm(verb.aux,subj.key)+" "+agree(verb.pp,flipG,subj.number));
+    var flipN=subj.number==="s"?"p":"s";
+    addWrong(auxForm(verb.aux,subj.key)+" "+agree(verb.pp,subj.gender,flipN));
+  }
+  var others=shuffle(VERBS.filter(function(v){return v.inf!==verb.inf;}));
+  for(var i=0;i<others.length && wrongSet.length<3;i++){ addWrong(passatoForm(others[i],subj)); }
+  var opts=shuffle([correct].concat(wrongSet.slice(0,3)));
+  var subjLabel=subj.label+(subj.name?" "+subj.name:"");
+  var html=promptBox(THEME_PASS, KIND_MC, subjLabel, verb.inf);
+  for(var j=0;j<opts.length;j++){
+    html+='<button onclick="answerMcPass(this,\''+encodeURIComponent(opts[j])+'\')" style="'+optStyle(THEME_PASS)+'">'+esc(opts[j])+'</button>';
+  }
+  setBody(html);
+}
+function answerMcPass(btn,enc){
+  var chosen=decodeURIComponent(enc), fb=document.getElementById("feedback");
+  var bs=btn.parentNode.getElementsByTagName("button");
+  for(var i=0;i<bs.length;i++){bs[i].onclick=null; bs[i].style.cursor="default";}
+  if(chosen===currentAnswer.value){ btn.style.background="#d7f0dd"; btn.style.borderColor="#3fae7a"; reward();
+    fb.innerHTML=(lastEvolved?evolutionBanner():'')+'<span style="color:#2f8a54; font-weight:600;">✓ Giusto!</span> '+continueBtn();
+  } else { btn.style.background="#f7dcd7"; btn.style.borderColor="#e0533f"; penalty();
+    fb.innerHTML='<span style="color:#c0392b; font-weight:600;">✗ Non è corretto.</span> Richtig: <b>'+esc(currentAnswer.value)+'</b> '+continueBtn(); }
+  state.answered++; render();
+}
+
+/* ---- 4) Freies Eintippen — Passato Prossimo ---- */
+function buildTypePass(){
+  CURRENT_CAT="pass";
+  setMode("Passato Prossimo — schreibe die richtige Form");
+  var verb=pick(VERBS), subj=pick(SUBJECTS);
+  var correct=passatoForm(verb,subj);
+  currentAnswer={value:correct};
+  var subjLabel=subj.label+(subj.name?" "+subj.name:"");
+  var html=promptBox(THEME_PASS, KIND_TYPE, subjLabel, verb.inf, "Hilfsverb + Partizip, z.B. „è andato")+
+    '<input id="typeInput" type="text" autocomplete="off" onkeydown="if(event.key===\'Enter\'){checkTypePass();}" '+
+    'style="width:100%; box-sizing:border-box; padding:12px 14px; border-radius:10px; border:2px solid '+THEME_PASS.strong+'; font-size:16px; font-family:inherit; text-align:center;" placeholder="ausiliare + participio ...">'+
+    '<button onclick="checkTypePass()" style="display:block; width:100%; margin-top:10px; padding:11px; border-radius:10px; border:none; background:'+THEME_PASS.strong+'; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit;">Prüfen</button>';
+  setBody(html);
+  document.getElementById("typeInput").focus();
+}
+function checkTypePass(){
+  var inp=document.getElementById("typeInput");
+  if(!inp || inp.disabled) return;
+  var val=normalizeForm(inp.value); if(val==="") return;
+  var fb=document.getElementById("feedback"); inp.disabled=true;
+  if(val===normalizeForm(currentAnswer.value)){ inp.style.borderColor="#3fae7a"; inp.style.background="#eafbef"; reward();
+    fb.innerHTML=(lastEvolved?evolutionBanner():'')+'<span style="color:#2f8a54; font-weight:600;">✓ Giusto!</span> <span style="color:#8a7a5c;">('+esc(currentAnswer.value)+')</span> '+continueBtn();
+  } else { inp.style.borderColor="#e0533f"; inp.style.background="#fdeeeb"; penalty();
+    fb.innerHTML='<span style="color:#c0392b; font-weight:600;">✗ Non proprio.</span> Richtig: <b>'+esc(currentAnswer.value)+'</b> '+continueBtn(); }
+  state.answered++; render();
+}
+
+/* ---- 5) Ganze Konjugation — Presente (nur essere, avere, stare) ---- */
+function buildFullPres(){
+  CURRENT_CAT="pres";
+  setMode("Presente — ganze Konjugation");
+  var verb=pick(FULL_VERBS);
+  currentAnswer={verb:verb};
+  var html='<div style="background:'+THEME_PRES.soft+'; border:2.5px solid '+THEME_PRES.strong+'; border-radius:'+THEME_PRES.radius+'; margin-bottom:14px; overflow:hidden;">'+
+    themedHeader(THEME_PRES, {icon:"📝", label:"Ganze Konjugation"})+
+    '<div style="text-align:center; padding:12px 12px 10px;">'+
+      '<div style="font-size:28px; font-weight:800; color:'+THEME_PRES.strong+';">'+esc(verb.inf)+'</div>'+
+      '<div style="font-size:11.5px; color:#8a7a5c; margin-top:2px;">Presente — trage alle sechs Formen ein</div>'+
+    '</div></div>';
+  PKEYS.forEach(function(key,i){
+    html+='<div style="display:flex; align-items:center; gap:8px; margin:6px 0;">'+
+      '<span style="width:58px; flex-shrink:0; font-size:13px; font-weight:700; color:#3a3222;">'+esc(PRONOUN_LABELS[i])+'</span>'+
+      '<input id="full_'+key+'" type="text" autocomplete="off" style="flex:1; box-sizing:border-box; padding:8px 10px; border-radius:8px; border:1.5px solid '+THEME_PRES.strong+'; font-size:14px; font-family:inherit;" placeholder="...">'+
+      '<span id="fullc_'+key+'" style="font-size:12px; color:#8a7a5c; min-width:64px; text-align:left;"></span>'+
+    '</div>';
+  });
+  html+='<button onclick="checkFullPres()" style="display:block; width:100%; margin-top:8px; padding:11px; border-radius:10px; border:none; background:'+THEME_PRES.strong+'; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit;">Prüfen</button>';
+  setBody(html);
+}
+function checkFullPres(){
+  var first=document.getElementById("full_io");
+  if(first && first.disabled) return;
+  var allCorrect=true;
+  PKEYS.forEach(function(key){
+    var inp=document.getElementById("full_"+key), span=document.getElementById("fullc_"+key);
+    if(!inp || inp.disabled) return;
+    var correct=currentAnswer.verb.pres[key];
+    var ok=normalizeForm(inp.value)===normalizeForm(correct);
+    inp.disabled=true;
+    if(ok){ inp.style.borderColor="#3fae7a"; inp.style.background="#eafbef"; }
+    else { inp.style.borderColor="#e0533f"; inp.style.background="#fdeeeb"; span.innerHTML='→ <b>'+esc(correct)+'</b>'; allCorrect=false; }
+  });
+  var fb=document.getElementById("feedback");
+  if(allCorrect){ reward();
+    fb.innerHTML=(lastEvolved?evolutionBanner():'')+'<span style="color:#2f8a54; font-weight:600;">✓ Tutte e sei giuste!</span> '+continueBtn();
+  } else { penalty();
+    fb.innerHTML='<span style="color:#c0392b; font-weight:600;">✗ Nicht alle richtig.</span> Richtige Formen stehen daneben. '+continueBtn(); }
+  state.answered++; render();
+}
+
+/* ---- 6) Ganze Konjugation — Passato Prossimo (nur essere, avere, stare) ---- */
+function buildFullPass(){
+  CURRENT_CAT="pass";
+  setMode("Passato Prossimo — ganze Konjugation");
+  var verb=pick(FULL_VERBS);
+  var forms={};
+  PKEYS.forEach(function(key){
+    var num=(key==="noi"||key==="voi"||key==="loro") ? "p" : "s";
+    forms[key]=passatoForm(verb, {key:key, gender:"m", number:num});
+  });
+  currentAnswer={verb:verb, forms:forms};
+  var html='<div style="background:'+THEME_PASS.soft+'; border:2.5px solid '+THEME_PASS.strong+'; border-radius:'+THEME_PASS.radius+'; margin-bottom:14px; overflow:hidden;">'+
+    themedHeader(THEME_PASS, {icon:"📝", label:"Ganze Konjugation"})+
+    '<div style="text-align:center; padding:12px 12px 10px;">'+
+      '<div style="font-size:28px; font-weight:800; color:'+THEME_PASS.strong+';">'+esc(verb.inf)+'</div>'+
+      '<div style="font-size:11.5px; color:#8a7a5c; margin-top:2px;">Passato Prossimo — Hilfsverb + Partizip (männliche Form), alle sechs Formen</div>'+
+    '</div></div>';
+  PKEYS.forEach(function(key,i){
+    html+='<div style="display:flex; align-items:center; gap:8px; margin:6px 0;">'+
+      '<span style="width:58px; flex-shrink:0; font-size:13px; font-weight:700; color:#3a3222;">'+esc(PRONOUN_LABELS[i])+'</span>'+
+      '<input id="full_'+key+'" type="text" autocomplete="off" style="flex:1; box-sizing:border-box; padding:8px 10px; border-radius:8px; border:1.5px solid '+THEME_PASS.strong+'; font-size:14px; font-family:inherit;" placeholder="ausiliare + participio">'+
+      '<span id="fullc_'+key+'" style="font-size:12px; color:#8a7a5c; min-width:78px; text-align:left;"></span>'+
+    '</div>';
+  });
+  html+='<button onclick="checkFullPass()" style="display:block; width:100%; margin-top:8px; padding:11px; border-radius:10px; border:none; background:'+THEME_PASS.strong+'; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit;">Prüfen</button>';
+  setBody(html);
+}
+function checkFullPass(){
+  var first=document.getElementById("full_io");
+  if(first && first.disabled) return;
+  var allCorrect=true;
+  PKEYS.forEach(function(key){
+    var inp=document.getElementById("full_"+key), span=document.getElementById("fullc_"+key);
+    if(!inp || inp.disabled) return;
+    var correct=currentAnswer.forms[key];
+    var ok=normalizeForm(inp.value)===normalizeForm(correct);
+    inp.disabled=true;
+    if(ok){ inp.style.borderColor="#3fae7a"; inp.style.background="#eafbef"; }
+    else { inp.style.borderColor="#e0533f"; inp.style.background="#fdeeeb"; span.innerHTML='→ <b>'+esc(correct)+'</b>'; allCorrect=false; }
+  });
+  var fb=document.getElementById("feedback");
+  if(allCorrect){ reward();
+    fb.innerHTML=(lastEvolved?evolutionBanner():'')+'<span style="color:#2f8a54; font-weight:600;">✓ Tutte e sei giuste!</span> '+continueBtn();
+  } else { penalty();
+    fb.innerHTML='<span style="color:#c0392b; font-weight:600;">✗ Nicht alle richtig.</span> Richtige Formen stehen daneben. '+continueBtn(); }
+  state.answered++; render();
+}
+
+/* ---- 7+8) Zuordnung — Presente & Passato Prossimo (gemeinsamer Motor) ---- */
+var matchSel=null, matchLeft=[], matchRight=[], matchDone=0, matchTheme=null;
+function renderMatch(theme, leftCombos, rightCombos){
+  matchTheme=theme;
+  matchLeft=leftCombos.slice(); matchRight=shuffle(rightCombos); matchSel=null; matchDone=0;
+  var html='<div style="background:'+theme.soft+'; border:2.5px solid '+theme.strong+'; border-radius:'+theme.radius+'; padding:2px; margin-bottom:6px;">'+
+    themedHeader(theme, KIND_MATCH)+
+    '<div style="text-align:center; font-size:11px; color:'+theme.strong+'; padding-top:6px;">4 Paare — Achtung, eine Form rechts passt zu keinem!</div>'+
+    '<div style="display:flex; gap:10px; padding:10px;"><div style="flex:1;">';
+  for(var i=0;i<matchLeft.length;i++){
+    html+='<button id="ml'+i+'" onclick="selLeft('+i+')" style="display:block; width:100%; margin:5px 0; padding:10px; border-radius:9px; border:1.5px solid '+theme.strong+'; border-left:6px solid '+theme.strong+'; background:#ffffff; color:#2b3a36; font-size:12.5px; cursor:pointer; font-family:inherit;">'+esc(matchLeft[i].left)+'</button>';
+  }
+  html+='</div><div style="flex:1;">';
+  for(var j=0;j<matchRight.length;j++){
+    html+='<button id="mr'+j+'" onclick="selRight('+j+')" style="display:block; width:100%; margin:5px 0; padding:10px; border-radius:9px; border:1.5px dashed '+theme.strong+'; background:'+theme.soft+'; color:'+theme.strong+'; font-weight:700; font-size:12.5px; cursor:pointer; font-family:inherit;">'+esc(matchRight[j].right)+'</button>';
+  }
+  html+='</div></div></div>';
+  setBody(html);
+}
+/* Zieht einen zusätzlichen Distraktor: eine Form, die zu KEINEM der vier
+   linken Einträge passt (andere Verb/Pronomen-Kombination, anderer Text). */
+function pickDistractor(combos, genFn){
+  var guard=0, d=null;
+  while(!d && guard<300){
+    guard++;
+    var cand=genFn();
+    if(combos.some(function(c){return c.id===cand.id || c.right===cand.right;})) continue;
+    d={id:"x-"+cand.id, left:null, right:cand.right};
+  }
+  return d;
+}
+function buildMatchPres(){
+  CURRENT_CAT="pres";
+  setMode("Zuordnung — Presente: Pronomen + Verb zur richtigen Form");
+  var combos=[], guard=0;
+  while(combos.length<4 && guard<200){
+    guard++;
+    var verb=pick(VERBS), key=pick(PKEYS);
+    var id=verb.inf+"|"+key;
+    if(combos.some(function(c){return c.id===id;})) continue;
+    combos.push({id:id, left:PRONOUN_LABELS[PKEYS.indexOf(key)]+" ("+verb.inf+")", right:verb.pres[key]});
+  }
+  var distractor=pickDistractor(combos, function(){
+    var verb=pick(VERBS), key=pick(PKEYS);
+    return {id:verb.inf+"|"+key, right:verb.pres[key]};
+  });
+  var rightPool=combos.concat(distractor?[distractor]:[]);
+  renderMatch(THEME_PRES, combos, rightPool);
+}
+function buildMatchPass(){
+  CURRENT_CAT="pass";
+  setMode("Zuordnung — Passato Prossimo: Subjekt + Verb zur richtigen Form");
+  var combos=[], guard=0;
+  while(combos.length<4 && guard<200){
+    guard++;
+    var verb=pick(VERBS), subj=pick(SUBJECTS);
+    var id=verb.inf+"|"+subj.label+subj.name+subj.gender+subj.number;
+    if(combos.some(function(c){return c.id===id;})) continue;
+    combos.push({id:id, left:subj.label+(subj.name?" "+subj.name:"")+" ("+verb.inf+")", right:passatoForm(verb,subj)});
+  }
+  var distractor=pickDistractor(combos, function(){
+    var verb=pick(VERBS), subj=pick(SUBJECTS);
+    return {id:verb.inf+"|"+subj.label+subj.name+subj.gender+subj.number, right:passatoForm(verb,subj)};
+  });
+  var rightPool=combos.concat(distractor?[distractor]:[]);
+  renderMatch(THEME_PASS, combos, rightPool);
+}
+function selLeft(i){
+  var b=document.getElementById("ml"+i); if(!b||b.disabled) return;
+  if(matchSel && matchSel.side==="L"){ var pb=document.getElementById("ml"+matchSel.idx); pb.style.background="#ffffff"; pb.style.borderColor=matchTheme.strong; }
+  matchSel={side:"L", idx:i}; b.style.background="#ffe9c7"; b.style.borderColor="#f0a92c";
+}
+function selRight(j){
+  if(!matchSel || matchSel.side!=="L") return;
+  var lb=document.getElementById("ml"+matchSel.idx), rb=document.getElementById("mr"+j);
+  if(!rb || rb.disabled) return;
+  var li=matchSel.idx;
+  if(matchLeft[li].id===matchRight[j].id){
+    lb.disabled=true; rb.disabled=true;
+    lb.style.background="#d7f0dd"; lb.style.borderColor="#3fae7a"; lb.style.cursor="default";
+    rb.style.background="#d7f0dd"; rb.style.borderColor="#3fae7a"; rb.style.cursor="default";
+    matchDone++; matchSel=null;
+    if(matchDone===matchLeft.length){ reward(); state.answered++;
+      document.getElementById("feedback").innerHTML=(lastEvolved?evolutionBanner():'')+'<span style="color:#2f8a54; font-weight:600;">✓ Tutte e quattro giuste!</span> '+continueBtn(); render(); }
+  } else {
+    rb.style.background="#f7dcd7"; rb.style.borderColor="#e0533f";
+    lb.style.background="#ffffff"; lb.style.borderColor=matchTheme.strong;
+    penalty(); state.answered++;
+    var jj=j; setTimeout(function(){ var x=document.getElementById("mr"+jj); if(x&&!x.disabled){x.style.background=matchTheme.soft; x.style.borderColor=matchTheme.strong;} },600);
+    matchSel=null; render();
+  }
+}
+
+/* ============ Zeitform-Auswahl ============ */
+function showSetup(){
+  setMode("Auswahl");
+  document.getElementById("scopeRow").style.display="none";
+  document.getElementById("masteryRow").style.display="none";
+  document.getElementById("scoreLine").innerText="";
+  document.getElementById("feedback").innerHTML="";
+  var html='<div style="font-size:13px; color:#6a5f45; margin-bottom:10px;">Was möchtest du üben?</div>';
+  html+='<button onclick="chooseScope(\'presente\')" style="display:block; width:100%; margin:6px 0; padding:12px; border-radius:'+THEME_PRES.radius+'; border:none; background:'+THEME_PRES.strong+'; color:#fff; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;">'+THEME_PRES.icon+' Nur Presente</button>';
+  html+='<button onclick="chooseScope(\'passato\')" style="display:block; width:100%; margin:6px 0; padding:12px; border-radius:'+THEME_PASS.radius+'; border:none; background:'+THEME_PASS.strong+'; color:#fff; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;">'+THEME_PASS.icon+' Nur Passato Prossimo</button>';
+  html+='<button onclick="chooseScope(\'mix\')" style="display:block; width:100%; margin:6px 0; padding:12px; border-radius:12px; border:none; background:linear-gradient(90deg,'+THEME_PRES.strong+' 50%,'+THEME_PASS.strong+' 50%); color:#fff; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;">'+THEME_PRES.icon+THEME_PASS.icon+' Beides gemischt</button>';
+  html+='<div style="font-size:11px; color:#8a7a5c; text-align:center; margin-top:8px;">🏆 Nur im gemischten Modus kann dein Wesen die Meister-Stufe erreichen — dafür braucht es je '+CAT_TARGET+' richtige Antworten in Presente <b>und</b> Passato Prossimo.</div>';
+  setBody(html);
+}
+function chooseScope(s){
+  SCOPE=s;
+  var label = s==="presente" ? (THEME_PRES.icon+" Presente") : (s==="passato" ? (THEME_PASS.icon+" Passato Prossimo") : (THEME_PRES.icon+THEME_PASS.icon+" Presente + Passato Prossimo"));
+  state={hp:60, xp:0, answered:0, correct:0, streak:0, fainted:false, catPres:0, catPass:0, evolved:false};
+  initModesForScope(); modePtr=-1;
+  document.getElementById("scopeRow").style.display="flex";
+  document.getElementById("scopeLabel").innerText=label;
+  render(); nextTask();
+}
+
+/* ============ Reset ============ */
+function resetGame(){
+  state={hp:60, xp:0, answered:0, correct:0, streak:0, fainted:false, catPres:0, catPass:0, evolved:false};
+  document.getElementById("scopeRow").style.display="none";
+  document.getElementById("scoreLine").innerText="";
+  render();
+  showSetup();
+}
+
+/* ============ Start ============ */
+render();
+showSetup();
+</script>
+</body>
+</html>
